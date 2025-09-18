@@ -86,7 +86,8 @@ public class PlayerScript : MonoBehaviour
         {
             animator.SetBool("Idle", true);
             animator.SetBool("Walk", false);
-            animator.SetBool("Running", false); 
+            animator.SetBool("Running", false);
+            animator.SetBool("IdleAim", false);
         }
     }
 
