@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-
 using UnityEngine;
 using UnityEngine.AI;
 using Object = UnityEngine.Object;
@@ -11,9 +10,9 @@ public class Zombie1 : MonoBehaviour
 {
     [Header("Zombie Health and Damage")]
     private float zombieHealth = 100f;
-
     private float presentHealth;
     public float giveDamage = 5f;
+    public HealthBar healthBar;
 
     [Header("Zombie Things")]
     public NavMeshAgent zombieAgent;
@@ -29,16 +28,15 @@ public class Zombie1 : MonoBehaviour
     private float walkingpointRadius = 2;
 
     [Header("Zombie Attacking Var")]
-    public float timeBtwAttack;
-
+    public float timeBtwAttack = 2f;
     private bool previouslyAttack;
 
     [Header("Zombie Animation")]
     public Animator anim;
 
     [Header("Zombie mood/states")]
-    public float visionRadius;
-    public float attackingRadius;
+    public float visionRadius = 10f;
+    public float attackingRadius = 3f;
     public bool playerInvisionRadius;
     public bool playerInattackingRadius;
 
@@ -48,16 +46,32 @@ public class Zombie1 : MonoBehaviour
     private void Awake()
     {
         presentHealth = zombieHealth;
+    
+        // Verificar si healthBar está asignado antes de usarlo
+        if (healthBar != null)
+        {
+            healthBar.GiveFullHealth(zombieHealth);
+        }
+    
         zombieAgent = GetComponent<NavMeshAgent>();
-        EnsureAgentOnNavMesh(); // coloca el agente en el NavMesh si aún no lo está
-        // zombieAgent.speed = zombieSpeed; // si quieres, descomenta
+        if (zombieAgent == null)
+        {
+            Debug.LogError("NavMeshAgent no encontrado en " + gameObject.name);
+            return;
+        }
+    
+        EnsureAgentOnNavMesh();
     }
     
     private void Start()
     {
-        // Solo se busca el player una vez
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null) playerBody = playerObj.transform;
+        if (playerObj != null) 
+        {
+            playerBody = playerObj.transform;
+            // Si no tienes LookPoint asignado, usa el playerBody
+            if (LookPoint == null) LookPoint = playerBody;
+        }
     }
 
     private void Update()
@@ -81,14 +95,13 @@ public class Zombie1 : MonoBehaviour
 
     private void Guard()
     {
-        // evita errores si no hay puntos
         if (walkPoints == null || walkPoints.Length == 0) return;
 
         if (Vector3.Distance(walkPoints[currentZombiePosition].transform.position, transform.position) < walkingpointRadius)
         {
             int newPoint;
             do { newPoint = Random.Range(0, walkPoints.Length); }
-            while (newPoint == currentZombiePosition); // evita repetir
+            while (newPoint == currentZombiePosition);
             currentZombiePosition = newPoint;
         }
 
@@ -104,33 +117,25 @@ public class Zombie1 : MonoBehaviour
 
     private void PursuePlayer()
     {
-        // 1. Verifica que haya Player
         if (playerBody == null) return;
-
-        // 2. Verifica que el agente esté en el NavMesh
         if (!EnsureAgentOnNavMesh()) return;
 
-        // 3. Actualiza parámetros del agente (solo si cambiaron)
         if (zombieAgent.stoppingDistance != 1.5f)
             zombieAgent.stoppingDistance = 1.5f;
 
         if (zombieAgent.speed != zombieSpeed)
             zombieAgent.speed = zombieSpeed;
 
-        // 4. Fija destino al Player (posición ACTUAL en cada frame)
         bool ok = zombieAgent.SetDestination(playerBody.position);
 
-        // 5. Animaciones según estado
         if (anim)
         {
             anim.SetBool("Walking", false);
-            anim.SetBool("Running", ok);   // correr si va hacia el Player
+            anim.SetBool("Running", ok);
             anim.SetBool("Attacking", false);
-            anim.SetBool("Died", !ok);     // si no pudo moverse → muerto
+            anim.SetBool("Died", false);
         }
     }
-
-   
 
     private void AttackPlayer()
     {
@@ -138,7 +143,14 @@ public class Zombie1 : MonoBehaviour
         TrySetDestination(transform.position);
 
         // mirar al punto (usa .position si es Transform)
-        if (LookPoint) transform.LookAt(LookPoint.position);
+        if (LookPoint)
+        {
+            Vector3 lookPos = LookPoint.position - transform.position;
+            lookPos.y = 0; // bloquea la rotación vertical
+            if (lookPos != Vector3.zero)
+                transform.rotation = Quaternion.LookRotation(lookPos);
+        }
+
 
         if (!previouslyAttack)
         {
@@ -146,8 +158,8 @@ public class Zombie1 : MonoBehaviour
             {
                 RaycastHit hitInfo;
                 if (Physics.Raycast(AttackingRaycastArea.transform.position,
-                                    AttackingRaycastArea.transform.forward,
-                                    out hitInfo, attackingRadius))
+                        AttackingRaycastArea.transform.forward,
+                        out hitInfo, attackingRadius))
                 {
                     Debug.Log("Attacking " + hitInfo.transform.name);
 
@@ -160,10 +172,8 @@ public class Zombie1 : MonoBehaviour
 
                     if (anim)
                     {
-                        anim.SetBool("Walking", false);
+                        anim.SetBool("Attacking", true);
                         anim.SetBool("Running", false);
-                        anim.SetBool("Attacking", true);  // corregido: atacar activo
-                        anim.SetBool("Died", false);
                     }
                 }
             }
@@ -182,6 +192,7 @@ public class Zombie1 : MonoBehaviour
     public void zombieHitDamage(float takeDamage)
     {
         presentHealth -= takeDamage;
+        healthBar.SetHealth(presentHealth);
 
         if (presentHealth <= 0)
         {
@@ -199,7 +210,6 @@ public class Zombie1 : MonoBehaviour
 
     private void zombieDie()
     {
-        // no forzar SetDestination si no está en NavMesh
         TrySetDestination(transform.position);
 
         zombieSpeed = 0f;
@@ -208,12 +218,17 @@ public class Zombie1 : MonoBehaviour
         playerInattackingRadius = false;
         playerInvisionRadius = false;
 
-        Object.Destroy(gameObject, 0.5f);
+        // Desactivar el NavMeshAgent
+        if (zombieAgent != null)
+        {
+            zombieAgent.enabled = false;
+        }
+
+        Object.Destroy(gameObject, 3f); // Aumenté el tiempo para ver la animación de muerte
     }
 
     // ----------------- utilidades internas -----------------
 
-    /// Coloca el agente en el NavMesh si aún no lo está (evita el error de SetDestination).
     private bool EnsureAgentOnNavMesh()
     {
         if (zombieAgent == null || !zombieAgent.enabled) return false;
@@ -222,18 +237,26 @@ public class Zombie1 : MonoBehaviour
         NavMeshHit hit;
         if (NavMesh.SamplePosition(transform.position, out hit, NAVMESH_SAMPLE_RADIUS, NavMesh.AllAreas))
         {
-            zombieAgent.Warp(hit.position); // lo “asienta” en el NavMesh
+            zombieAgent.Warp(hit.position);
             return true;
         }
         return false;
     }
 
-    /// Envuelve SetDestination de forma segura.
     private bool TrySetDestination(Vector3 target)
     {
         if (!EnsureAgentOnNavMesh()) return false;
         return zombieAgent.SetDestination(target);
     }
-}
 
+    // Para debug - visualizar los rangos en el Scene view
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, visionRadius);
+        
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackingRadius);
+    }
+}
 
