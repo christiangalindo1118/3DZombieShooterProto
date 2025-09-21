@@ -85,7 +85,7 @@ public class VehicleController : MonoBehaviour
             HandleMotor();
             HandleSteering();
             UpdateWheels();
-            HitZommbies();
+            HitZombies();
         }
     }
 
@@ -176,7 +176,7 @@ public class VehicleController : MonoBehaviour
         transform.rotation = rotation;
     }
 
-    void HitZommbies()
+    void HitZombies()
     {
         RaycastHit hitInfo;
 
@@ -188,7 +188,8 @@ public class VehicleController : MonoBehaviour
          
             Zombie1 zombie1 = hitInfo.transform.GetComponent<Zombie1>();
             Zombie2 zombie2 = hitInfo.transform.GetComponent<Zombie2>();
-         
+            
+        
            
             if (zombie1 != null)
             {

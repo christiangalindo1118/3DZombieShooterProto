@@ -1,3 +1,5 @@
+
+using System.Collections;
 using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
@@ -11,6 +13,8 @@ public class PlayerScript : MonoBehaviour
     private float playerHealth = 120f;
 
     public float presentHealth;
+    public GameObject PlayerDamage;
+    public HealthBar healthbar;
     
     [Header("Player Script Cameras")]
     public Transform PlayerCamera;
@@ -34,6 +38,7 @@ public class PlayerScript : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         presentHealth = playerHealth;
+        healthbar.GiveFullHealth(playerHealth);
     }
 
     private void Update()
@@ -140,6 +145,9 @@ public class PlayerScript : MonoBehaviour
     public void playerHitDamage(float takeDamage)
     {
         presentHealth -= takeDamage;
+        StartCoroutine(playerDamage());
+        
+        healthbar.SetHealth(presentHealth);
 
         if (presentHealth <= 0)
         {
@@ -151,6 +159,13 @@ public class PlayerScript : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
         Object.Destroy(gameObject, 1.0f);
+    }
+
+    IEnumerator playerDamage()
+    {
+        PlayerDamage.SetActive(true);
+        yield return new WaitForSeconds(1.18f);
+        PlayerDamage.SetActive(false);
     }
 
 }
