@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +9,6 @@ public class HealthBar : MonoBehaviour
 
     private void Start()
     {
-        // Guardar el tamaño original del slider
         sliderRect = healthbarSlider.GetComponent<RectTransform>();
         originalSize = sliderRect.sizeDelta;
     }
@@ -21,7 +18,6 @@ public class HealthBar : MonoBehaviour
         healthbarSlider.maxValue = health;
         healthbarSlider.value = health;
         
-        // Forzar el tamaño original después de cambiar maxValue
         if (sliderRect != null)
         {
             sliderRect.sizeDelta = originalSize;
@@ -32,7 +28,6 @@ public class HealthBar : MonoBehaviour
     {
         healthbarSlider.value = health;
         
-        // Mantener el tamaño fijo
         if (sliderRect != null)
         {
             sliderRect.sizeDelta = originalSize;
