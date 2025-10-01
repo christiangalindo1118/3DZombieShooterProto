@@ -47,6 +47,7 @@ public class VehicleController : MonoBehaviour
     private float giveDamageOf = 100f;
     
     public GameObject goreEffect;
+    public GameObject DestroyEffect;
     
 
     private Rigidbody rb;
@@ -105,6 +106,17 @@ public class VehicleController : MonoBehaviour
 
         // Desactivar modelo del jugador
         PlayerCharacter.SetActive(false);
+        
+            // ---------- MARCAR OBJETIVO 3 COMO COMPLETADO ----------
+        if (ObjectivesComplete.occurrence != null)
+        {
+            ObjectivesComplete.occurrence.CompleteObjective(3); // 3 = "Find vehicle"
+        }
+        else
+        {
+            Debug.LogWarning("ObjectivesComplete instance not found when entering vehicle.");
+        }
+        // ------------------------------------------------------
     }
 
     void ExitVehicle()
@@ -188,6 +200,7 @@ public class VehicleController : MonoBehaviour
          
             Zombie1 zombie1 = hitInfo.transform.GetComponent<Zombie1>();
             Zombie2 zombie2 = hitInfo.transform.GetComponent<Zombie2>();
+            ObjectToHit objectToHit = hitInfo.transform.GetComponent<ObjectToHit>();
             
         
            
@@ -205,6 +218,14 @@ public class VehicleController : MonoBehaviour
                 GameObject goreEffectGo = Instantiate(goreEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
                 Destroy(goreEffectGo, 1f); 
             }
+
+            else if (objectToHit != null)
+            {
+                objectToHit.ObjectHitDamage(giveDamageOf);
+                GameObject WoodGo = Instantiate(DestroyEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
+                Destroy(WoodGo, 1f);
+            }
+            
         }
     }
 }

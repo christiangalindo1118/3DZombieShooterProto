@@ -1,0 +1,16 @@
+.gitattributes
+.gitignore
+Assets/Animations/FemaleAnimation.controller.meta
+Assets/Scripts/HealthBar.cs
+Assets/Scripts/PlayerScript.cs
+Assets/Sprites/MainMenu.PNG.meta
+Assets/Sprites/MainMenu1.PNG.meta
+Assets/Sprites/Player1.png.meta
+Assets/Sprites/Player2.png.meta
+Assets/Sprites/Player3.png.meta
+Assets/TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF - Fallback.asset
+Packages/manifest.json
+Packages/packages-lock.json
+ProjectSettings/EditorBuildSettings.asset
+ProjectSettings/NavMeshAreas.asset
+ProjectSettings/ProjectSettings.asset

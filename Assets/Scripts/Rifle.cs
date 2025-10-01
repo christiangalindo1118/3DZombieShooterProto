@@ -31,11 +31,20 @@ public class Rifle : MonoBehaviour
    public GameObject WoodEffect;
    public GameObject goreEffect;
 
+   [Header("Sounds and UI")]
+   public GameObject AmmoOutUI;
+
+   public AudioClip shootingSound;
+   public AudioClip reloadingSound;
+   public AudioSource audioSource;
+   
+
    private void Awake()
    {
       transform.SetParent(hand);
-     //rifleUI.SetActive(true);
+      rifleUI.SetActive(true);
       presentAmmunition = maxinumAmmunition;
+      audioSource = GetComponent<AudioSource>();
    }
 
    private void Update()
@@ -88,6 +97,7 @@ public class Rifle : MonoBehaviour
       if (mag == 0)
       {
          //show ammo out text
+         StartCoroutine(ShowAmmoOut());
          return;
       }
       
@@ -104,6 +114,7 @@ public class Rifle : MonoBehaviour
       
       
       muzzleSpark.Play();
+      audioSource.PlayOneShot(shootingSound);
       RaycastHit hitInfo;
 
       if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hitInfo, shootingRange))
@@ -143,7 +154,7 @@ public class Rifle : MonoBehaviour
       setReloading = true;
       Debug.Log("reloading");
       animator.SetBool("Reloading", true);
-      //play reload sound
+      audioSource.PlayOneShot(reloadingSound);
       yield return new WaitForSeconds(reloadingTime);
       animator.SetBool("Reloading", false);
       presentAmmunition = maxinumAmmunition;
@@ -151,5 +162,12 @@ public class Rifle : MonoBehaviour
       player.PlayerSprint = 3;
       setReloading = false;
 
+   }
+
+   IEnumerator ShowAmmoOut()
+   {
+      AmmoOutUI.SetActive(true);
+      yield return new WaitForSeconds(5f);
+      AmmoOutUI.SetActive(false);
    }
 }

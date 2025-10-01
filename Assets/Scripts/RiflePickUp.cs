@@ -19,32 +19,36 @@ public class RiflePickUp : MonoBehaviour
 
     private void Awake()
     {
-        PlayerRifle.SetActive(false);
-        rifleUI.SetActive(false); // UI del rifle empieza desactivada
+        if (PlayerRifle != null) PlayerRifle.SetActive(false);
+        if (rifleUI != null) rifleUI.SetActive(false); // UI del rifle empieza desactivada
     }
 
     private void Update()
     {
-        // Solo permitir golpes si NO tiene el rifle
         if (!hasRifle)
         {
             if (Input.GetButtonDown("Fire1") && Time.time >= nextTimeToPunch)
             {
-                animator.SetBool("Punch", true);
-                animator.SetBool("Idle", false);
-                
+                if (animator != null)
+                {
+                    animator.SetBool("Punch", true);
+                    animator.SetBool("Idle", false);
+                }
                 nextTimeToPunch = Time.time + 1f / punchCharge;
-                playerPunch.Punch();
+                if (playerPunch != null) playerPunch.Punch();
             }
             else
             {
-                animator.SetBool("Punch", false);
-                animator.SetBool("Idle", true);
+                if (animator != null)
+                {
+                    animator.SetBool("Punch", false);
+                    animator.SetBool("Idle", true);
+                }
             }
         }
 
-        // Lógica para recoger el rifle
-        if (!hasRifle && Vector3.Distance(transform.position, player.transform.position) < radius)
+        // Pickup logic using distance
+        if (!hasRifle && player != null && Vector3.Distance(transform.position, player.transform.position) < radius)
         {
             if (Input.GetKeyDown(KeyCode.F))
             {
@@ -55,40 +59,42 @@ public class RiflePickUp : MonoBehaviour
 
     private void PickupTheRifle()
     {
-        // Activar rifle del jugador
-        PlayerRifle.SetActive(true);
-        
-        // Desactivar rifle del suelo
-        PickupRifle.SetActive(false);
-        
-        // Activar UI del rifle
-        rifleUI.SetActive(true);
-        
-        // Marcar que ya tiene rifle
+        if (PlayerRifle != null) PlayerRifle.SetActive(true);
+        if (PickupRifle != null) PickupRifle.SetActive(false);
+        if (rifleUI != null) rifleUI.SetActive(true);
         hasRifle = true;
-        
-        // Desactivar animaciones de puño
+
         if (animator != null)
         {
             animator.SetBool("Punch", false);
             animator.SetBool("Idle", true);
         }
-        
-        // Inicializar la UI con valores iniciales
+
         InitializeRifleUI();
-        
+
+        // marcar objetivo 1
+        var oc = ObjectivesComplete.occurrence ?? FindObjectOfType<ObjectivesComplete>();
+        if (oc != null)
+        {
+            oc.CompleteObjective(1);
+            oc.ShowObjectivesMenu(); // opcional, abrir el menu cuando recoja el rifle
+        }
+        else
+        {
+            Debug.LogWarning("ObjectivesComplete instance not found. Objective not marked.");
+        }
+
         Debug.Log("Rifle recogido - UI activada desde RiflePickUp");
     }
 
     private void InitializeRifleUI()
     {
-        // Obtener el componente Rifle para inicializar la UI
-        Rifle rifleComponent = PlayerRifle.GetComponent<Rifle>();
+        Rifle rifleComponent = PlayerRifle != null ? PlayerRifle.GetComponent<Rifle>() : null;
         if (rifleComponent != null && AmmoAcount.occurrence != null)
         {
-            // Inicializar UI con munición actual
-            AmmoAcount.occurrence.UpdateAmmoText(32); // maxinumAmmunition
+            AmmoAcount.occurrence.UpdateAmmoText(32);
             AmmoAcount.occurrence.UpdateMagText(rifleComponent.mag);
         }
     }
 }
+
