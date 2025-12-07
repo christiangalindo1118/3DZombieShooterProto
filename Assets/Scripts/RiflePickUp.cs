@@ -20,34 +20,46 @@ public class RiflePickUp : MonoBehaviour
     private void Awake()
     {
         if (PlayerRifle != null) PlayerRifle.SetActive(false);
-        if (rifleUI != null) rifleUI.SetActive(false); // UI del rifle empieza desactivada
+        if (rifleUI != null) rifleUI.SetActive(false); 
     }
 
     private void Update()
     {
         if (!hasRifle)
         {
-            if (Input.GetButtonDown("Fire1") && Time.time >= nextTimeToPunch)
-            {
-                if (animator != null)
-                {
-                    animator.SetBool("Punch", true);
-                    animator.SetBool("Idle", false);
-                }
-                nextTimeToPunch = Time.time + 1f / punchCharge;
-                if (playerPunch != null) playerPunch.Punch();
-            }
-            else
-            {
-                if (animator != null)
-                {
-                    animator.SetBool("Punch", false);
-                    animator.SetBool("Idle", true);
-                }
-            }
+            HandlePunching();
         }
 
-        // Pickup logic using distance
+        HandlePickupLogic();
+    }
+
+    private void HandlePunching()
+    {
+        if (Input.GetButtonDown("Fire1") && Time.time >= nextTimeToPunch)
+        {
+            if (animator != null)
+            {
+                animator.SetBool("Punch", true);
+                animator.SetBool("Idle", false);
+            }
+
+            nextTimeToPunch = Time.time + 1f / punchCharge;
+
+            if (playerPunch != null)
+                playerPunch.Punch();
+        }
+        else
+        {
+            if (animator != null)
+            {
+                animator.SetBool("Punch", false);
+                animator.SetBool("Idle", true);
+            }
+        }
+    }
+
+    private void HandlePickupLogic()
+    {
         if (!hasRifle && player != null && Vector3.Distance(transform.position, player.transform.position) < radius)
         {
             if (Input.GetKeyDown(KeyCode.F))
@@ -62,6 +74,7 @@ public class RiflePickUp : MonoBehaviour
         if (PlayerRifle != null) PlayerRifle.SetActive(true);
         if (PickupRifle != null) PickupRifle.SetActive(false);
         if (rifleUI != null) rifleUI.SetActive(true);
+
         hasRifle = true;
 
         if (animator != null)
@@ -72,12 +85,11 @@ public class RiflePickUp : MonoBehaviour
 
         InitializeRifleUI();
 
-        // marcar objetivo 1
-        var oc = ObjectivesComplete.occurrence ?? FindObjectOfType<ObjectivesComplete>();
-        if (oc != null)
+        // ========= NUEVA FORMA CORRECTA =========
+        if (ObjectivesComplete.Instance != null)
         {
-            oc.CompleteObjective(1);
-            oc.ShowObjectivesMenu(); // opcional, abrir el menu cuando recoja el rifle
+            ObjectivesComplete.Instance.CompleteObjective(1);
+            ObjectivesComplete.Instance.ShowMenu();  // opcional
         }
         else
         {
@@ -90,6 +102,7 @@ public class RiflePickUp : MonoBehaviour
     private void InitializeRifleUI()
     {
         Rifle rifleComponent = PlayerRifle != null ? PlayerRifle.GetComponent<Rifle>() : null;
+
         if (rifleComponent != null && AmmoAcount.occurrence != null)
         {
             AmmoAcount.occurrence.UpdateAmmoText(32);
@@ -97,4 +110,5 @@ public class RiflePickUp : MonoBehaviour
         }
     }
 }
+
 

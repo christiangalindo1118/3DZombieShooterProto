@@ -3,72 +3,105 @@ using UnityEngine.SceneManagement;
 
 public class Menus : MonoBehaviour
 {
-    [Header("All Menu´s")] public GameObject pauseMenuUI;
-    public GameObject EndGameMenuUI;
-    public GameObject ObjectiveMenuUI;
+    [Header("Menus")]
+    public GameObject pauseMenuUI;
+    public GameObject endGameMenuUI;
+    public GameObject objectiveMenuUI;
 
     public static bool GameIsStopped = false;
+    private bool objectiveMenuOpen = false;
 
-    public void Update()
+    void Update()
     {
+        // ESC = PAUSA
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (GameIsStopped)
-            {
+            if (pauseMenuUI.activeSelf)
                 Resume();
-                Cursor.lockState = CursorLockMode.Locked;
-            }
             else
-            {
                 Pause();
-                Cursor.lockState = CursorLockMode.None;
-            }
         }
-        else if (Input.GetKeyDown("m"))
+
+        // M = OBJETIVOS
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            if (GameIsStopped)
-            {
-                removeObjectives();
-                Cursor.lockState = CursorLockMode.Locked;
-            }
+            if (objectiveMenuOpen)
+                HideObjectives();
             else
-            {
-                showObjectives();
-                Cursor.lockState = CursorLockMode.None;
-            }
-        }    
+                ShowObjectives();
+        }
     }
 
-    public void showObjectives()
+    // =========================
+    //       PAUSA
+    // =========================
+
+    public void Pause()
     {
-        ObjectiveMenuUI.SetActive(true);
+        pauseMenuUI.SetActive(true);
+
         Time.timeScale = 0f;
         GameIsStopped = true;
-    }
 
-    public void removeObjectives()
-    {
-        ObjectiveMenuUI.SetActive(false);
-        Time.timeScale = 1f;
-        Cursor.lockState = CursorLockMode.Locked;
-        GameIsStopped = false; 
+        UnlockCursor();
     }
 
     public void Resume()
     {
         pauseMenuUI.SetActive(false);
+
         Time.timeScale = 1f;
-        Cursor.lockState = CursorLockMode.Locked;
         GameIsStopped = false;
+
+        LockCursor();
     }
+
+    // =========================
+    //     OBJETIVOS
+    // =========================
+
+    public void ShowObjectives()
+    {
+        objectiveMenuUI.SetActive(true);
+        objectiveMenuOpen = true;
+
+        Time.timeScale = 0f;
+        GameIsStopped = true;
+
+        UnlockCursor();
+
+        // 🔥 Refrescar los textos al abrir menú
+        if (ObjectivesComplete.Instance != null)
+            ObjectivesComplete.Instance.ShowMenu();
+    }
+
+    public void HideObjectives()
+    {
+        objectiveMenuUI.SetActive(false);
+        objectiveMenuOpen = false;
+
+        Time.timeScale = 1f;
+        GameIsStopped = false;
+
+        LockCursor();
+
+        if (ObjectivesComplete.Instance != null)
+            ObjectivesComplete.Instance.HideMenu();
+    }
+
+    // =========================
+    //    FUNCIONES GENERALES
+    // =========================
 
     public void Restart()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
 
     public void LoadMenu()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
 
@@ -78,12 +111,19 @@ public class Menus : MonoBehaviour
         Application.Quit();
     }
 
-    void Pause()
+    // =========================
+    //       CURSOR
+    // =========================
+
+    private void LockCursor()
     {
-        pauseMenuUI.SetActive(true);
-        Time.timeScale = 0f;
-        GameIsStopped = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
-
+    private void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 }

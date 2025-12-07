@@ -3,13 +3,18 @@ using UnityEngine;
 
 public class AmmoAcount : MonoBehaviour
 {
-    public TextMeshProUGUI ammunitionText;  // Para Canvas UI
-    public TextMeshProUGUI magText;         // Para Canvas UI
+    [SerializeField] private TextMeshProUGUI ammunitionText;
+    [SerializeField] private TextMeshProUGUI magText;
 
-    public static AmmoAcount occurrence;
+    public static AmmoAcount occurrence { get; private set; }
 
     private void Awake()
     {
+        if (occurrence != null && occurrence != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         occurrence = this;
     }
 
@@ -17,7 +22,7 @@ public class AmmoAcount : MonoBehaviour
     {
         if (ammunitionText != null)
         {
-            ammunitionText.text = "Ammo: " + presentAmmunition;
+            ammunitionText.text = $"Ammo: {presentAmmunition}";
         }
     }
 
@@ -25,7 +30,7 @@ public class AmmoAcount : MonoBehaviour
     {
         if (magText != null)
         {
-            magText.text = "Magazines: " + presentMag;
+            magText.text = $"Magazines: {presentMag}";
         }
     }
 }

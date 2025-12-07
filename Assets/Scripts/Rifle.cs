@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public class Rifle : MonoBehaviour
 {
@@ -23,8 +24,6 @@ public class Rifle : MonoBehaviour
    public float reloadingTime = 1.3f;
    private bool setReloading = false;
 
-
-
    [Header("Rifle Effects")] 
    public ParticleSystem muzzleSpark;
 
@@ -37,7 +36,6 @@ public class Rifle : MonoBehaviour
    public AudioClip shootingSound;
    public AudioClip reloadingSound;
    public AudioSource audioSource;
-   
 
    private void Awake()
    {
@@ -49,6 +47,19 @@ public class Rifle : MonoBehaviour
 
    private void Update()
    {
+      if (Menus.GameIsStopped)
+         return;
+
+      // Evita que el rifle consuma input cuando el puntero está sobre UI (ratón o touch)
+      if (EventSystem.current != null)
+      {
+         // Mouse
+         if (EventSystem.current.IsPointerOverGameObject())
+            return;
+         // Touch: si hay touch comprobar fingerId
+         if (Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+            return;
+      }
 
       if (setReloading)
          return;
@@ -59,6 +70,7 @@ public class Rifle : MonoBehaviour
          return;
       }
 
+      // CORRECCIÓN: uso de paréntesis para asegurar la precedencia deseada
       if (Input.GetButton("Fire1") && Time.time >= nextTimeToShoot)
       {
          animator.SetBool("Fire", true);
@@ -67,7 +79,7 @@ public class Rifle : MonoBehaviour
          nextTimeToShoot = Time.time + 1f / fireCharge;
          Shoot();
       }
-      else if (Input.GetButton("Fire1") && Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+      else if (Input.GetButton("Fire1") && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow)))
       {
          animator.SetBool("Idle", false);
          animator.SetBool("FireWalk", true);
@@ -86,33 +98,26 @@ public class Rifle : MonoBehaviour
          animator.SetBool("Idle", true);
          animator.SetBool("FireWalk", false); 
       }
-
-
-}
+   }
 
    private void Shoot()
    {
-      
-      //check for mag
       if (mag == 0)
       {
-         //show ammo out text
          StartCoroutine(ShowAmmoOut());
          return;
       }
-      
+
       presentAmmunition--;
 
       if (presentAmmunition == 0)
       {
          mag--;
       }
-      
-      //updating the UI
+
       AmmoAcount.occurrence.UpdateAmmoText(presentAmmunition);
       AmmoAcount.occurrence.UpdateMagText(mag);
-      
-      
+
       muzzleSpark.Play();
       audioSource.PlayOneShot(shootingSound);
       RaycastHit hitInfo;
@@ -120,12 +125,12 @@ public class Rifle : MonoBehaviour
       if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hitInfo, shootingRange))
       {
          Debug.Log(hitInfo.transform.name);
-         
+
          ObjectToHit objectToHit = hitInfo.transform.GetComponent<ObjectToHit>();
-         
+
          Zombie1 zombie1 = hitInfo.transform.GetComponent<Zombie1>();
          Zombie2 zombie2 = hitInfo.transform.GetComponent<Zombie2>();
-         
+
          if (objectToHit != null)
          {
             objectToHit.ObjectHitDamage(giveDamageOf);
@@ -136,17 +141,17 @@ public class Rifle : MonoBehaviour
          {
             zombie1.zombieHitDamage(giveDamageOf);
             GameObject goreEffectGo = Instantiate(goreEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
-            Destroy(goreEffectGo, 1f); 
+            Destroy(goreEffectGo, 1f);
          }
          else if (zombie2 != null)
          {
             zombie2.zombieHitDamage(giveDamageOf);
             GameObject goreEffectGo = Instantiate(goreEffect, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
-            Destroy(goreEffectGo, 1f); 
+            Destroy(goreEffectGo, 1f);
          }
       }
    } 
-   
+
    IEnumerator Reload()
    {
       player.PlayerSpeed = 0f;
@@ -161,7 +166,6 @@ public class Rifle : MonoBehaviour
       player.PlayerSpeed = 1.9f;
       player.PlayerSprint = 3;
       setReloading = false;
-
    }
 
    IEnumerator ShowAmmoOut()

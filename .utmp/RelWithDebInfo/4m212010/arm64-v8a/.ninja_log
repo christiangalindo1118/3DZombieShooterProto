@@ -1,0 +1,12 @@
+# ninja log v5
+141	1340	7867493883188578	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	8cb06470c07fe00c
+1355	2543	7867493892601792	D:/Unity/3DZombieShooter3/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/4m212010/obj/arm64-v8a/libswappywrapper.so	34388e90103d220d
+80	7287	7867493939866679	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	977a100fe433eb49
+43	7314	7867493940272540	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	9c28f6d5c27b9b31
+28	7322	7867493941377815	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	2ad77777e065fed2
+121	7329	7867493942178631	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	f486400c86243171
+16	7606	7867493945544191	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	f8cade64b32d11bc
+60	8447	7867493954194784	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	f1b2ba47f822317e
+102	8554	7867493955297045	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	995db8913b5e6529
+2	8724	7867493956943754	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	75e86f5bce5bfc24
+8725	9007	7867493959829987	D:/Unity/3DZombieShooter3/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/4m212010/obj/arm64-v8a/libgame.so	c51fb1cbd74c05d8

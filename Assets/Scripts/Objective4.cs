@@ -5,11 +5,20 @@ public class Objective4 : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Vehicle")
+        if (other.CompareTag("Vehicle"))
         {
-            ObjectivesComplete.occurrence.GetObjectivesDone(true, true, true, true);
+            if (ObjectivesComplete.Instance != null)
+            {
+                ObjectivesComplete.Instance.GetObjectivesDone(true, true, true, true);
+            }
+            else
+            {
+                Debug.LogWarning("ObjectivesComplete instance not found in OnTriggerEnter.");
+            }
 
             SceneManager.LoadScene("MainMenu");
         }
     }
+
+
 }

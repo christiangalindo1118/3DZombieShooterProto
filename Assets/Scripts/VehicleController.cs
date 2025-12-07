@@ -49,6 +49,8 @@ public class VehicleController : MonoBehaviour
     public GameObject goreEffect;
     public GameObject DestroyEffect;
     
+    public static ObjectivesComplete Instance; // Singleton moderno
+
 
     private Rigidbody rb;
 
@@ -108,14 +110,15 @@ public class VehicleController : MonoBehaviour
         PlayerCharacter.SetActive(false);
         
             // ---------- MARCAR OBJETIVO 3 COMO COMPLETADO ----------
-        if (ObjectivesComplete.occurrence != null)
-        {
-            ObjectivesComplete.occurrence.CompleteObjective(3); // 3 = "Find vehicle"
-        }
-        else
-        {
-            Debug.LogWarning("ObjectivesComplete instance not found when entering vehicle.");
-        }
+            if (ObjectivesComplete.Instance != null)
+            {
+                ObjectivesComplete.Instance.CompleteObjective(3); // 3 = "Find vehicle"
+            }
+            else
+            {
+                Debug.LogWarning("ObjectivesComplete instance not found when entering vehicle.");
+            }
+
         // ------------------------------------------------------
     }
 

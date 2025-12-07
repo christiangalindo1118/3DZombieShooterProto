@@ -5,18 +5,21 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/MainMenu.unity
     guid: b09ce7bfe9d43af49a58da252eac6a2c
   - enabled: 1
+    path: Assets/ZombieLand Mobille.unity
+    guid: 5f9492e6dc9b1a84ba47c8ccbaef6eeb
+  - enabled: 0
     path: Assets/ZombieLand.unity
-    guid: 754ea7b52d916774a91324d045079d40
-  - enabled: 1
+    guid: dd9029e4e75f52e42a04919a40a2a7f6
+  - enabled: 0
     path: Assets/ZombieLand1.unity
-    guid: 7306ebadc2a03f242b7e43c01b206e84
-  - enabled: 1
+    guid: fc54b301a2b1ef549a9f4333a96b0f7f
+  - enabled: 0
     path: Assets/ZombieLand2.unity
-    guid: 50aa7df6e1953e443be4a27a90c994df
+    guid: d1bd768e361802e41b29c65c999d21a2
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   m_UseUCBPForAssetBundles: 0
